@@ -19,6 +19,7 @@
             align-items: center;
             justify-content: center;
             overflow: hidden;
+            padding: 20px;
         }
 
         .floating-hearts {
@@ -53,13 +54,14 @@
             position: relative;
             z-index: 10;
             perspective: 1000px;
+            width: 100%;
+            max-width: 400px;
         }
 
         .envelope {
-            width: min(350px, 90vw);
-            height: auto;
-            min-height: 250px;
-            max-height: 500px;
+            width: 100%;
+            max-width: 350px;
+            height: 250px;
             background: #f4f4f4;
             position: relative;
             margin: 0 auto;
@@ -70,7 +72,7 @@
         }
 
         .envelope.opened {
-            transform: rotateX(-20deg) scale(1.1);
+            transform: rotateX(-20deg) scale(1.05);
         }
 
         .envelope::before {
@@ -80,8 +82,8 @@
             left: 0;
             width: 0;
             height: 0;
-            border-left: calc(min(350px, 90vw) / 2) solid transparent;
-            border-right: calc(min(350px, 90vw) / 2) solid transparent;
+            border-left: 50% solid transparent;
+            border-right: 50% solid transparent;
             border-top: 125px solid #e8e8e8;
             transform-origin: top center;
             transition: transform 0.8s ease;
@@ -136,9 +138,8 @@
             position: absolute;
             top: 20px;
             left: 20px;
-            width: 310px;
-            min-height: 210px;
-            max-height: 400px;
+            right: 20px;
+            bottom: 20px;
             background: #fff;
             border-radius: 4px;
             padding: 25px;
@@ -149,6 +150,8 @@
             z-index: 2;
             overflow-y: auto;
             overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
         }
 
         .letter.show {
@@ -163,6 +166,12 @@
             text-align: center;
             font-weight: normal;
             text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+            flex-shrink: 0;
+        }
+
+        .letter-content {
+            flex: 1;
+            overflow-y: auto;
         }
 
         .letter p {
@@ -179,6 +188,7 @@
             color: #666;
             margin-top: 20px;
             font-size: 18px;
+            flex-shrink: 0;
         }
 
         .instruction {
@@ -201,24 +211,12 @@
         }
 
         @media (max-width: 480px) {
-            body {
-                padding: 20px;
-            }
-            
             .envelope {
-                width: 95vw;
                 max-width: 320px;
-                min-height: 220px;
             }
             
             .letter {
-                width: calc(95vw - 40px);
-                max-width: 280px;
-                min-height: 180px;
-                max-height: 350px;
                 padding: 20px;
-                top: 15px;
-                left: 15px;
             }
             
             .letter h1 {
@@ -247,19 +245,16 @@
             .instruction {
                 font-size: 16px;
                 margin-bottom: 20px;
-                padding: 0 20px;
             }
         }
 
         @media (max-width: 320px) {
             .envelope {
-                width: 98vw;
                 max-width: 300px;
+                height: 220px;
             }
             
             .letter {
-                width: calc(98vw - 30px);
-                max-width: 270px;
                 padding: 15px;
             }
             
@@ -269,6 +264,10 @@
             
             .letter p {
                 font-size: 13px;
+            }
+            
+            .seal {
+                top: 85px;
             }
         }
     </style>
@@ -286,10 +285,12 @@
             
             <div class="letter" id="letter">
                 <h1>Para alguien muy especial ✨</h1>
-                <p>No quiero que estes enojada, tampoco que pienses que estoy enojado, simplemente queria verte, se que no di una buena impresion de mi cuando me conociste.</p>
-                <p>Realmente me agradas mucho, se te quiere y se te aprecia, quiero que sepas que realmente queria verte y pasar tiempo contigo, tienes tu vida entonces es como si fuera un intruso ahí.</p>
-                <p>Esta carta realmente es solamente con el fin de que puedas ver que realmente quiero seguir hablando y conocerte aun más asi que hablame cuando puedas, cuando quieras, quiero seguir a tu lado.</p>
-                <p>Aunque te haya conocido por una aplicacion realmente me agrado como eres y para serte sincero esas fotos no te hacen nada de justicia, a mis ojos eres bastante bonita.</p>
+                <div class="letter-content">
+                    <p>No quiero que estes enojada, tampoco que pienses que estoy enojado, simplemente queria verte, se que no di una buena impresion de mi cuando me conociste.</p>
+                    <p>Realmente me agradas mucho, se te quiere y se te aprecia, quiero que sepas que realmente queria verte y pasar tiempo contigo, tienes tu vida entonces es como si fuera un intruso ahí.</p>
+                    <p>Esta carta realmente es solamente con el fin de que puedas ver que realmente quiero seguir hablando y conocerte aun más asi que hablame cuando puedas, cuando quieras, quiero seguir a tu lado.</p>
+                    <p>Aunque te haya conocido por una aplicacion realmente me agrado como eres y para serte sincero esas fotos no te hacen nada de justicia, a mis ojos eres bastante bonita.</p>
+                </div>
                 <div class="signature">esperare tus mensajes----fabri</div>
             </div>
         </div>
@@ -330,16 +331,19 @@
             
             // Después de la animación del sello
             setTimeout(() => {
-                // Ajustar altura del sobre según contenido
-                const letterHeight = letter.scrollHeight + 40; // padding extra
-                envelope.style.minHeight = Math.max(250, letterHeight) + 'px';
-                
                 // Abrir sobre
                 envelope.classList.add('opened');
                 
                 // Mostrar carta
                 setTimeout(() => {
                     letter.classList.add('show');
+                    
+                    // Ajustar altura del sobre después de que la carta sea visible
+                    setTimeout(() => {
+                        const letterContentHeight = letter.scrollHeight;
+                        const newHeight = Math.min(Math.max(250, letterContentHeight + 40), 450);
+                        envelope.style.height = newHeight + 'px';
+                    }, 200);
                     
                     // Crear más corazones para celebrar
                     for(let i = 0; i < 10; i++) {
